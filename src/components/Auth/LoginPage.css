@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.login-container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+    /* Animated Gradient Overlay */
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientMove 15s ease infinite;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Dark overlay pattern */
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.9) 100%),
+        url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2500&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
+    z-index: 0;
+    opacity: 0.8;
+}
+
+.login-box {
+    position: relative;
+    z-index: 10;
+    background: rgba(40, 40, 40, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 3rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    width: 400px;
+    max-width: 90%;
+    color: white;
+    text-align: center;
+}
+
+.login-header h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    font-weight: 700;
+    color: #e31e24;
+    /* CEEPEE Red */
+    letter-spacing: 2px;
+}
+
+.login-header p {
+    font-size: 0.8rem;
+    margin-top: 5px;
+    letter-spacing: 3px;
+    color: #ccc;
+    text-transform: uppercase;
+}
+
+.form-title {
+    margin: 2rem 0;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #ddd;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    /* Fix for overflow */
+}
+
+.input-group input:focus {
+    border-color: #e31e24;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #e31e24;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.auth-btn:hover {
+    background-color: #c41217;
+}
+
+.auth-btn:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+.toggle-auth {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.toggle-auth span {
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 5px;
+}
+
+.error-message {
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    color: #ffcccc;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.error-icon {
+    font-size: 1.1rem;
+}
+
+/* Password Toggle Styles */
+.password-group {
+    position: relative;
+}
+
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper input {
+    padding-right: 40px;
+    /* Space for eye icon */
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    transition: color 0.2s;
+    outline: none;
+}
+
+.toggle-password-btn:hover {
+    color: #e31e24;
+}

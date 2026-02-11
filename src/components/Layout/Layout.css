@@ -1,0 +1,719 @@
+/* Global Layout Styles */
+.app-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    /* Anchor for absolute bars */
+    overflow: hidden;
+}
+
+/* Main Content (Visualizer) */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    /* Lowest level */
+    height: 100%;
+    width: 100%;
+}
+
+/* Sidebar - Floating Left Glass */
+.sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 320px;
+    background: rgba(20, 20, 20, 0.4);
+    /* Clearer Glass */
+    backdrop-filter: blur(15px);
+    /* Less Frosty */
+    -webkit-backdrop-filter: blur(15px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    padding-top: 100px;
+    /* Space for TopBar overlap if needed, or visual separation */
+    z-index: 20;
+    /* Above visualizer */
+    transition: width 0.3s ease;
+}
+
+.sidebar-header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.sidebar-header h2 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin: 0;
+    background: linear-gradient(45deg, #fff, #bbb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar-header p {
+    color: #888;
+    font-size: 10px;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 600;
+}
+
+.sidebar-back-btn {
+    width: 100%;
+    padding: 12px 20px;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    backdrop-filter: blur(10px);
+}
+
+.sidebar-back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Top Bar - Floating Top Glass */
+.top-bar {
+    position: absolute;
+    top: 20px;
+    left: 350px;
+    right: 20px;
+    width: calc(100% - 370px);
+    height: 60px;
+    background: rgba(20, 20, 20, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    z-index: 25;
+}
+
+/* Navigation Menu Styles */
+.top-nav-menu {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-category {
+    position: relative;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 10px 0;
+    transition: color 0.2s;
+    letter-spacing: 1px;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+    color: #fff;
+}
+
+.nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 260px;
+    /* Slightly wider for better layout */
+    max-height: 80vh;
+    /* Prevent it from going offscreen if list is long */
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: fadeInDropdown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-dropdown.grid-view {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 columns for 'All' view */
+    min-width: 400px;
+    gap: 10px;
+    padding: 15px;
+}
+
+/* Custom Scrollbar for dropdown */
+.nav-dropdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.nav-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+@keyframes fadeInDropdown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.dropdown-item {
+    display: flex;
+    flex-direction: column;
+    /* Stack thumb and name */
+    background: rgba(40, 40, 40, 0.4);
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+
+
+/* For non-grid view (single category), maybe keep row layout? 
+   Actually, "little view" might imply thumbnail focus. 
+   Let's make them uniform tiles. */
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-item.active {
+    background: rgba(227, 30, 36, 0.1);
+    /* Brand color hint */
+    border: 1px solid rgba(227, 30, 36, 0.4);
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.15);
+}
+
+.dropdown-item.active .room-name {
+    color: #fff;
+}
+
+.dropdown-thumb {
+    width: 80px;
+    height: 50px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.room-name {
+    font-size: 11px;
+    color: #ccc;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.top-bar-left {
+    display: flex;
+    align-items: center;
+}
+
+.top-label {
+    margin-right: 24px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #666;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+/* Bottom Bar - Floating Bottom Glass */
+.bottom-bar {
+    height: 180px;
+    background: rgba(20, 20, 20, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    padding: 20px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    /* Or 320px if we want it next to sidebar, but full width looks better */
+    width: 100%;
+    z-index: 15;
+    /* Below sidebar if overlap, or above? Sidebar usually top-level nav */
+    padding-left: 360px;
+    /* Offset content so it's not behind sidebar */
+    pointer-events: auto;
+}
+
+/* Adjust Sidebar to be on top of bottom bar */
+.sidebar {
+    z-index: 30;
+}
+
+.bar-header {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.bar-header h3 {
+    margin: 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.bar-header .subtitle {
+    font-size: 12px;
+    color: #888;
+}
+
+.material-list {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+}
+
+.material-list::-webkit-scrollbar {
+    display: none;
+}
+
+.material-item {
+    min-width: 100px;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.material-item:hover {
+    transform: translateY(-5px) scale(1.05);
+}
+
+.material-item.active .mat-preview {
+    border: 2px solid #fff;
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+}
+
+.mat-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.mat-info {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.mat-name {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ddd;
+    white-space: normal;
+    /* Allow wrapping */
+    line-height: 1.2;
+    display: block;
+    white-space: normal;
+    /* Allow wrapping */
+    line-height: 1.2;
+    max-width: 100%;
+}
+
+.mat-meta {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.suggestion-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background-color: #ffd700;
+    color: #000;
+    font-size: 8px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 800;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* AI Match Section */
+.ai-match-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-match-section h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+#ai-prompt-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #ddd;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 12px;
+    resize: vertical;
+    outline: none;
+    margin-bottom: 10px;
+}
+
+#ai-prompt-input:focus {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ai-match-section button {
+    width: 100%;
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    /* Blue theme? Or match VIZA? */
+    /* Let's keep it neutral or use generic button style suitable for dark theme */
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.ai-match-section button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.ai-match-section button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ai-result {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 255, 0, 0.05);
+    /* Slight green tint for success/result? */
+    border: 1px solid rgba(0, 255, 0, 0.1);
+    border-radius: 8px;
+    font-size: 12px;
+    color: #cfc;
+    line-height: 1.4;
+}
+
+/* Material Details Sidebar Styles */
+.material-details-section {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding-right: 5px;
+    /* For scrollbar space */
+}
+
+/* Custom Scrollbar for details */
+.material-details-section::-webkit-scrollbar {
+    width: 4px;
+}
+
+.material-details-section::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.detail-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.detail-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.detail-label {
+    display: block;
+    font-size: 0.65rem;
+    color: #e31e24;
+    /* Brand Red */
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.detail-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item .label {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.detail-item .value {
+    font-size: 0.9rem;
+    color: #ddd;
+    font-weight: 500;
+    text-align: right;
+}
+
+.detail-footer {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.detail-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sku {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #555;
+    text-align: center;
+    padding: 40px 20px;
+    border: 2px dashed rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.empty-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+/* Sidebar Content Updates */
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-right: 5px;
+}
+
+.sidebar-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 0.75rem;
+    color: #e31e24;
+    /* Brand Red */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+/* Sidebar ID List Styles */
+.sidebar-material-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.sidebar-mat-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    /* Allow growth */
+    min-height: 110px;
+}
+
+.sidebar-mat-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.sidebar-mat-item.active {
+    border-color: #e31e24;
+    background: rgba(227, 30, 36, 0.1);
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.2);
+}
+
+.sidebar-mat-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    /* Dark background for transparent/contain images */
+    margin-bottom: 8px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-mat-info {
+    text-align: center;
+    width: 100%;
+}
+
+.sidebar-mat-info .name {
+    display: block;
+    font-size: 0.75rem;
+    color: #ddd;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-mat-info .meta {
+    font-size: 0.65rem;
+    color: #888;
+}
+
+.expert-pick-dot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    background-color: #ffd700;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.empty-text {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Compact details tweak */
+.detail-card.compact .detail-item {
+    padding: 4px 0;
+}
+
+.detail-card.compact .detail-header h3 {
+    font-size: 1rem;
+}
