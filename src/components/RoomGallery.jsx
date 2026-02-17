@@ -25,20 +25,28 @@ const RoomGallery = ({ onSelect }) => {
 
     return (
         <div className="gallery-container">
-            {/* Header & Filters */}
-            <div className="gallery-header">
-                <h2 className="gallery-title">Design Gallery</h2>
-                <div className="gallery-filters">
-                    {categories.map(cat => (
-                        <button
-                            key={cat}
-                            className={`filter-btn ${filter === cat ? 'active' : ''}`}
-                            onClick={() => setFilter(cat)}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+            {/* Top Bar: Title + Scroll Banner */}
+            <div className="gallery-top-bar">
+                <h2 className="gallery-title">Gallery</h2>
+
+                <div className="scroll-banner-container">
+                    <div className="scroll-content">
+                        Visualize Your Dream Space • Premium Tiles & Textures • Luxury Surfaces Since 1980 • Visualize Your Dream Space  • Premium Tiles & Textures • Luxury Surfaces Since 1980 •
+                    </div>
                 </div>
+            </div>
+
+            {/* Filters */}
+            <div className="gallery-filters">
+                {categories.map(cat => (
+                    <button
+                        key={cat}
+                        className={`filter-btn ${filter === cat ? 'active' : ''}`}
+                        onClick={() => setFilter(cat)}
+                    >
+                        {cat}
+                    </button>
+                ))}
             </div>
 
             {/* Masonry Grid */}

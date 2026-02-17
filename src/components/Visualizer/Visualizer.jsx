@@ -1,45 +1,153 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import jsPDF from "jspdf";
 import { useStore } from '../../context/StoreContext';
 import { drawWarpedImage } from './CanvasUtils';
 import './Visualizer.css';
 
-const Visualizer = () => {
+const Visualizer = ({ isSidebarOpen, toggleSidebar }) => {
+    console.log("Visualizer Component Rendering");
     const canvasRef = useRef(null);
-    const containerRef = useRef(null);
     const frameRef = useRef(null);
-    const isMounted = useRef(false); // Track initial mount
-    const { currentRoom, primaryMaterial, setCurrentRoom, setPrimaryMaterial } = useStore();
+    const containerRef = useRef(null);
+    const { currentRoom, primaryMaterial, setPrimaryMaterial } = useStore();
+
+    // New states and effects from the instruction
+    const [isLoading, setIsLoading] = useState(true);
+    const [resultImage, setResultImage] = useState(null); // Store the generated/processed image
+
+    useEffect(() => {
+        // Mock loading for initial room load
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, [currentRoom]);
+
+    const handleDownload = (format) => {
+        alert(`Downloading as ${format}... (Feature pending implementation)`);
+    };
+    // End of new states and effects from the instruction
 
     // Use Refs for images to avoid re-renders on every load progress
     // But we need state to trigger redraw when loaded
+    // Use Refs for images to avoid re-renders on every load progress
+    // But we need state to trigger redraw when loaded
     const [roomImg, setRoomImg] = useState(null);
+    const [matImg, setMatImg] = useState(null);
+    const [aiResultImg, setAiResultImg] = useState(null); // The "After" image
+    const [sliderValue, setSliderValue] = useState(50);   // 0 to 100
+
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const [baseRoomImg, setBaseRoomImg] = useState(null);
     const [frameRatio, setFrameRatio] = useState(null);
-    const [matImg, setMatImg] = useState(null);
-    const [isTransitioning, setIsTransitioning] = useState(false);
+
+    // Zoom & Pan State
+    const [zoom, setZoom] = useState(1.35); // Default zoomed in for "bigger" feel
+    const [pan, setPan] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const lastMousePos = useRef({ x: 0, y: 0 });
+
+    // Slider Drag State
+    const isResizing = useRef(false);
+
+    // Handle Wheel Zoom
+    const handleWheel = (e) => {
+        const scaleAmount = -e.deltaY * 0.001;
+        setZoom(prevZoom => {
+            const newZoom = prevZoom + scaleAmount;
+            return Math.min(Math.max(1.0, newZoom), 4.0); // Clamp between 1x and 4x
+        });
+    };
+
+    // Handle Interactions (Pan vs Slider)
+    const handleMouseDown = (e) => {
+        if (!frameRef.current) return;
+
+        lastMousePos.current = { x: e.clientX, y: e.clientY };
+
+        // Check if clicking near the slider line (only if AI image exists)
+        if (aiResultImg) {
+            const rect = frameRef.current.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const frameWidth = rect.width;
+            const sliderPos = (sliderValue / 100) * frameWidth;
+
+            // buffer of 40px for easier grabbing
+            if (Math.abs(clickX - sliderPos) < 40) {
+                isResizing.current = true;
+                return; // Don't start pan
+            }
+        }
+
+        setIsDragging(true);
+    };
+
+    const handleMouseMove = (e) => {
+        // 1. Handle Slider Resizing
+        if (isResizing.current && frameRef.current) {
+            const rect = frameRef.current.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const newValue = (x / rect.width) * 100;
+            setSliderValue(Math.min(Math.max(0, newValue), 100)); // Clamp 0-100
+            return;
+        }
+
+        // 2. Handle Image Panning
+        if (!isDragging) return;
+        const dx = e.clientX - lastMousePos.current.x;
+        const dy = e.clientY - lastMousePos.current.y;
+        lastMousePos.current = { x: e.clientX, y: e.clientY };
+
+        setPan(prevPan => ({
+            x: prevPan.x + dx,
+            y: prevPan.y + dy
+        }));
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+        isResizing.current = false;
+    };
+
+    // Reset Pan/Zoom when room changes
+    useEffect(() => {
+        setZoom(1.35);
+        setPan({ x: 0, y: 0 });
+    }, [currentRoom]);
 
 
     // Image Cache (Simple in-memory)
     const imageCache = useRef({});
 
     const loadImage = (src, isRoom, setAsBase = false) => {
-        if (!src) return;
+        if (!src) {
+            console.error("loadImage called with null src");
+            return;
+        }
 
         // Return existing if cached
         if (imageCache.current[src]) {
             if (isRoom) {
                 setRoomImg(imageCache.current[src]);
-                if (setAsBase) setBaseRoomImg(imageCache.current[src]);
+                if (setAsBase) {
+                    setBaseRoomImg(imageCache.current[src]);
+                    setFrameRatio(imageCache.current[src].width / imageCache.current[src].height);
+                }
             }
-            else setMatImg(imageCache.current[src]);
+            else {
+                setMatImg(imageCache.current[src]);
+            }
             return;
         }
 
+        console.log(`[Visualizer] Loading image: ${src}`);
         const img = new Image();
         img.src = src;
-        img.crossOrigin = "Anonymous";
+        img.crossOrigin = "Anonymous"; // Keep this for canvas export
+
         img.onload = () => {
+            console.log(`[Visualizer] Loaded image successfully: (W:${img.width} x H:${img.height}) ${src}`);
             imageCache.current[src] = img;
             if (isRoom) {
                 setRoomImg(img);
@@ -48,17 +156,35 @@ const Visualizer = () => {
                     setFrameRatio(img.width / img.height);
                 }
             }
-            else setMatImg(img);
+            else {
+                setMatImg(img);
+            }
+        };
+
+        img.onerror = (err) => {
+            console.error(`[Visualizer] Failed to load image: ${src}`, err);
+            setStatusMessage(`Error loading image: ${src}`); // Show on UI
+            if (isRoom && setAsBase) {
+                alert(`Failed to load room image: ${src}. Check console for details.`);
+            }
         };
     };
 
     // Load Room Image
     useEffect(() => {
-        if (!currentRoom) return;
+        if (!currentRoom) {
+            console.warn("[Visualizer] No currentRoom set");
+            return;
+        }
+        console.log("[Visualizer] currentRoom changed:", currentRoom.id, currentRoom.imageUrl);
         loadImage(currentRoom.imageUrl, true, true);
+        setAiResultImg(null); // Reset AI result when room changes
     }, [currentRoom]);
 
-    // Load Material Image
+    // Track if we should show the client-side warp overlay
+    const [showClientPreview, setShowClientPreview] = useState(true);
+
+    // ... [Inside useEffect for primaryMaterial change]
     useEffect(() => {
         if (!primaryMaterial || primaryMaterial.id === 'mat_none') {
             setMatImg(null);
@@ -66,6 +192,7 @@ const Visualizer = () => {
             return;
         }
         setIsTransitioning(true);
+        setShowClientPreview(true); // Reset to show preview initially
         loadImage(primaryMaterial.textureUrl, false);
     }, [primaryMaterial]);
 
@@ -73,12 +200,21 @@ const Visualizer = () => {
     useEffect(() => {
         const canvas = canvasRef.current;
         const frame = frameRef.current;
-        if (!canvas || !frame || !currentRoom) return;
+        // Proceed even if currentRoom is null (to show "No Room" message)
+        if (!canvas || !frame) return;
 
         const ctx = canvas.getContext('2d');
 
+        // Allow wheel event on canvas container to prevent page scroll when zooming
+        const preventDefaultWheel = (e) => {
+            e.preventDefault();
+        };
+
+        frame.addEventListener('wheel', preventDefaultWheel, { passive: false });
+
+
         const render = () => {
-            const baseImg = baseRoomImg || roomImg;
+            const baseImg = baseRoomImg || roomImg; // The "Before" image
             const frameRect = frame.getBoundingClientRect();
             const frameWidth = Math.max(1, frameRect.width);
             const frameHeight = Math.max(1, frameRect.height);
@@ -92,32 +228,101 @@ const Visualizer = () => {
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, frameWidth, frameHeight);
 
-            if (roomImg && baseImg) {
-                const scale = Math.min(frameWidth / baseImg.width, frameHeight / baseImg.height);
+            if (baseImg) {
+                // Calculate containment logic for base image
+                // Use state-based ZOOM
+                const scale = Math.min(frameWidth / baseImg.width, frameHeight / baseImg.height) * zoom;
+
                 const drawWidth = baseImg.width * scale;
                 const drawHeight = baseImg.height * scale;
-                const offsetX = (frameWidth - drawWidth) / 2;
-                const offsetY = (frameHeight - drawHeight) / 2;
 
-                const containScale = Math.min(drawWidth / roomImg.width, drawHeight / roomImg.height);
-                const roomDrawWidth = roomImg.width * containScale;
-                const roomDrawHeight = roomImg.height * containScale;
-                const roomOffsetX = offsetX + (drawWidth - roomDrawWidth) / 2;
-                const roomOffsetY = offsetY + (drawHeight - roomDrawHeight) / 2;
+                // Center + Pan Offset
+                const offsetX = (frameWidth - drawWidth) / 2 + pan.x;
+                const offsetY = (frameHeight - drawHeight) / 2 + pan.y;
 
-                ctx.drawImage(roomImg, roomOffsetX, roomOffsetY, roomDrawWidth, roomDrawHeight);
+                // 1. Draw "Before" Image (Base Room)
+                ctx.drawImage(baseImg, offsetX, offsetY, drawWidth, drawHeight);
 
-                if (matImg && currentRoom.floorCoordinates) {
+                // 2. Client-side Preview (Warped Material on Before Image)
+                // Only if no AI result or if transparent? currently just if showClientPreview
+                if (showClientPreview && matImg && currentRoom.floorCoordinates) {
                     const scaledCoords = currentRoom.floorCoordinates.map(p => ({
                         x: p.x * scale + offsetX,
                         y: p.y * scale + offsetY
                     }));
-                    drawWarpedImage(ctx, matImg, scaledCoords);
+                    try {
+                        drawWarpedImage(ctx, matImg, scaledCoords);
+                    } catch (err) {
+                        console.error("Error drawing warped image:", err);
+                    }
                     setIsTransitioning(false);
                 }
+
+                // 3. Draw "After" Image (AI Result) with Clipper
+                if (aiResultImg) {
+                    const splitX = frameWidth * (sliderValue / 100);
+
+                    ctx.save();
+                    ctx.beginPath();
+
+                    // CLIP RIGHT SIDE for Generated Image (Standard "Before | After" layout)
+                    // Left Side (0 to splitX) = Original (Base)
+                    // Right Side (splitX to Width) = Generated (AI)
+                    ctx.rect(splitX, 0, frameWidth - splitX, frameHeight);
+                    ctx.clip();
+
+                    // Draw AI Result with same containment & pan
+                    ctx.drawImage(aiResultImg, offsetX, offsetY, drawWidth, drawHeight);
+
+                    ctx.restore();
+
+                    // 4. Draw Slider Line
+                    ctx.beginPath();
+                    ctx.moveTo(splitX, 0);
+                    ctx.lineTo(splitX, frameHeight);
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Slider Handle Circle - Styled like reference
+                    // Outer dark circle
+                    ctx.beginPath();
+                    ctx.arc(splitX, frameHeight / 2, 18, 0, Math.PI * 2);
+                    ctx.fillStyle = '#1a1a1a'; // Dark grey/black
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Arrows
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    // Left Arrow
+                    ctx.moveTo(splitX - 4, frameHeight / 2);
+                    ctx.lineTo(splitX - 1, frameHeight / 2 - 4);
+                    ctx.lineTo(splitX - 1, frameHeight / 2 + 4);
+                    // Right Arrow
+                    ctx.moveTo(splitX + 4, frameHeight / 2);
+                    ctx.lineTo(splitX + 1, frameHeight / 2 - 4);
+                    ctx.lineTo(splitX + 1, frameHeight / 2 + 4);
+                    ctx.fill();
+
+                }
             } else {
+                // Draw valid debug info on canvas instead of just black rect
                 ctx.fillStyle = '#111';
                 ctx.fillRect(0, 0, frameWidth, frameHeight);
+
+                ctx.fillStyle = '#666';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Loading Image...', frameWidth / 2, frameHeight / 2);
+                if (currentRoom) {
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText(currentRoom.imageUrl, frameWidth / 2, frameHeight / 2 + 25);
+                } else {
+                    ctx.fillText('No Room Selected', frameWidth / 2, frameHeight / 2 + 25);
+                }
             }
         };
 
@@ -125,8 +330,13 @@ const Visualizer = () => {
 
         const handleResize = () => render();
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, [roomImg, matImg, currentRoom, baseRoomImg]);
+
+        // Clean up
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            frame.removeEventListener('wheel', preventDefaultWheel);
+        }
+    }, [roomImg, matImg, currentRoom, baseRoomImg, showClientPreview, aiResultImg, sliderValue, zoom, pan]); // Dependencies include zoom, pan
 
     // --- AI Visualization Logic ---
     const [isVisualizing, setIsVisualizing] = useState(false);
@@ -194,9 +404,18 @@ const Visualizer = () => {
             );
 
             if (imageUrl) {
-                loadImage(imageUrl, true); // Replace room image with generated one
-                setGeneratedUrl(imageUrl); // Store for comparison
-                setStatusMessage('✓ Visualization Complete');
+                console.log("[Visualizer] Received new AI image.");
+                // Load into AI Result state instead of replacing base room
+                const img = new Image();
+                img.src = imageUrl;
+                img.crossOrigin = "Anonymous";
+                img.onload = () => {
+                    setAiResultImg(img);
+                    setGeneratedUrl(imageUrl);
+                    setShowClientPreview(false);
+                    setStatusMessage('✓ New Design Applied!');
+                    setSliderValue(50); // Reset slider to center
+                };
             }
         } catch (error) {
             console.error("Visualization failed:", error);
@@ -230,7 +449,7 @@ const Visualizer = () => {
             const file = new File([blob], 'CEEPEE-design.jpg', { type: 'image/jpeg' });
 
             // 2. Prepare Data
-            const text = `Check out this design from CEEPEE Marbles!\nRoom: ${currentRoom?.name}\nTile: ${primaryMaterial?.name}`;
+            const text = `Check out this design from CEEPEE Marbles!\nRoom: ${currentRoom?.name} \nTile: ${primaryMaterial?.name} `;
             const title = "My CEEPEE Design";
 
             // 3. Check for Native Sharing (Mobile)
@@ -337,13 +556,36 @@ const Visualizer = () => {
     };
 
     return (
-        <div className="visualizer-container" ref={containerRef}>
+        <div className={`visualizer-container ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} ref={containerRef}>
             <div
                 ref={frameRef}
-                className="visualizer-frame"
-                style={frameRatio ? { '--frame-ratio': frameRatio } : undefined}
+                className={`visualizer-frame ${isDragging ? 'dragging' : ''}`}
+                style={{
+                    '--frame-ratio': frameRatio,
+                    cursor: isDragging ? 'grabbing' : (aiResultImg ? 'default' : 'grab'),
+                    touchAction: 'none' // Prevent mobile scrolling
+                }}
+                onWheel={handleWheel}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
             >
                 <canvas ref={canvasRef} className="visualizer-canvas" />
+
+                {/* Comparison Slider Input */}
+                {aiResultImg && (
+                    <>
+                        {/* Custom Slider Interaction handled via Frame events now */}
+                        <div
+                            className="comparison-labels"
+                            style={{ left: `${sliderValue}%` }}
+                        >
+                            <div className="comp-label original">Original</div>
+                            <div className="comp-label generated">Generated</div>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Loading Overlay */}
@@ -367,22 +609,7 @@ const Visualizer = () => {
 
             {/* Download Buttons Group */}
             <div className="visualizer-actions">
-                {/* Compare Button (Only appears if we have a generated image) */}
-                {generatedUrl && (
-                    <button
-                        className="visualizer-icon-btn compare-btn"
-                        onMouseDown={() => handleCompare(true)}
-                        onMouseUp={() => handleCompare(false)}
-                        onMouseLeave={() => handleCompare(false)}
-                        onTouchStart={() => handleCompare(true)}
-                        onTouchEnd={() => handleCompare(false)}
-                        title="Hold to Compare Original"
-                    >
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                            <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z" />
-                        </svg>
-                    </button>
-                )}
+                {/* Compare Button removed as per user request */}
 
                 <button className="visualizer-icon-btn whatsapp-btn" onClick={handleSmartShare} title="Share on WhatsApp">
                     {/* WhatsApp Icon */}

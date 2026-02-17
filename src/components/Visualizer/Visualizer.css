@@ -7,61 +7,189 @@
   overflow: hidden;
   position: relative;
   box-sizing: border-box;
-  padding-left: 320px;
-  /* padding-bottom: 180px; Removed bottom padding to use more space */
-  padding-right: 20px;
-  /* Add slight right padding */
-  padding-top: 20px;
-  /* Reduced top padding */
-  padding-bottom: 20px;
+  padding: 0;
+  /* Remove default padding for full screen feel */
   height: 100vh;
-  /* Force full viewport height */
+  transition: padding-left 0.3s ease;
+}
+
+.visualizer-container.sidebar-open {
+  padding-left: 320px;
+}
+
+.visualizer-container.sidebar-closed {
+  padding-left: 0;
+  /* Full width when closed */
+}
+
+/* Slider Overlay */
+.visualizer-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: col-resize;
+  z-index: 20;
+  /* Above canvas, below status/actions */
+  margin: 0;
+}
+
+.slider-label {
+  position: absolute;
+  top: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 15;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Responsive Visualizer */
+@media (max-width: 768px) {
+  .visualizer-container {
+    padding-left: 0;
+    /* Remove sidebar space */
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    /* Let bottom bar overlap or adjust */
+  }
+
+  .mobile-menu-btn {
+    display: block !important;
+    /* Show menu button */
+  }
+
+  .visualizer-frame {
+    max-height: 70vh;
+    /* Leave space for bottom bar */
+  }
+
+  .visualizer-status {
+    bottom: 40px;
+    /* Lowered significantly */
+    left: 50%;
+    width: 90%;
+    padding: 10px;
+  }
+
+  .visualizer-actions {
+    top: 70px;
+    right: 10px;
+  }
+
+  .visualizer-icon-btn {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .visualizer-frame {
-  width: 100%;
+  /* Robust Aspect Ratio Scaling */
   max-width: 100%;
   max-height: 100%;
+
+  /* Let aspect-ratio determine dimensions */
   aspect-ratio: var(--frame-ratio, 16 / 9);
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  /* Fixed alignment issue */
+  margin: auto;
+  /* Center in container */
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
 }
 
-.visualizer-canvas {
-  max-width: 100%;
-  max-height: 100%;
-  width: 100%;
-  height: 100%;
-  display: block;
-  box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
-  border-radius: 4px;
-  /* Slight softening */
-  transition: filter 0.3s ease;
+/* Joined Comparison Labels (Pill Style) */
+.comparison-labels {
+  position: absolute;
+  top: 40px;
+  /* Dynamic left set via inline style */
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 25;
+  filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  /* Let clicks pass through to slider/canvas */
+  white-space: nowrap;
+  transition: top 0.3s ease;
 }
 
-/* Loading State: Blur Canvas */
-.visualizer-container:has(.visualizer-overlay) .visualizer-canvas {
-  filter: blur(8px) brightness(0.7);
-  transform: scale(0.98);
+@media (max-width: 768px) {
+  .comparison-labels {
+    top: 20px;
+  }
+
+  .comp-label {
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+    height: 36px !important;
+    letter-spacing: 1px !important;
+  }
 }
 
-/* Premium Loading Overlay */
+.comp-label {
+  padding: 10px 30px;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  /* Fixed height for perfect alignment */
+  box-sizing: border-box;
+}
+
+.comp-label.original {
+  background: #222;
+  color: #fff;
+  border-radius: 50px 0 0 50px;
+  /* Rounded Left */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: none;
+  /* Seamless join */
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+}
+
+.comp-label.generated {
+  background: #fff;
+  color: #000;
+  border-radius: 0 50px 50px 0;
+  /* Rounded Right */
+  border: 1px solid #fff;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+}
+
+/* Loading Overlay - Restored */
 .visualizer-overlay {
   position: absolute;
   top: 0;
-  left: 320px;
-  /* Offset for sidebar */
-  right: 0;
-  bottom: 0;
-  /* No background needed if we blur canvas underneath */
-  background: transparent;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 50;
-  animation: fadeIn 0.4s ease-out;
+  animation: fadeIn 0.3s ease;
 }
 
 /* Tile Wave Loader */
@@ -135,10 +263,10 @@
 /* AI Insight Card - Premium Glass */
 .visualizer-status {
   position: absolute;
-  bottom: 220px;
-  /* Float above bottom bar */
-  left: 58%;
-  /* Centered in work area roughly */
+  bottom: 40px;
+  /* Float lower down */
+  left: 50%;
+  /* Centered perfectly */
   transform: translateX(-50%);
   z-index: 100;
 
@@ -493,4 +621,26 @@
   60% {
     transform: translateY(-5px);
   }
+}
+
+/* Fix Centering when Sidebar is Open (Desktop) */
+@media (min-width: 769px) {
+  .visualizer-container.sidebar-open .visualizer-overlay {
+    padding-left: 320px;
+    box-sizing: border-box;
+  }
+
+  .visualizer-container.sidebar-open .visualizer-status {
+    left: calc(50% + 160px);
+    /* 50% + Half Sidebar Width */
+    transition: left 0.3s ease;
+  }
+}
+
+.visualizer-overlay {
+  transition: padding-left 0.3s ease;
+}
+
+.visualizer-status {
+  transition: left 0.3s ease, bottom 0.3s ease, transform 0.3s ease;
 }

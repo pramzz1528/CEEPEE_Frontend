@@ -95,6 +95,11 @@ export function computeHomography(srcPts, dstPts) {
  * This effectively "warps" the texture onto the quad defined by dstPts.
  */
 export function drawWarpedImage(ctx, img, dstPts) {
+    if (!ctx || !img || !dstPts || dstPts.length !== 4) {
+        console.warn("drawWarpedImage: Invalid arguments", { ctx: !!ctx, img: !!img, dstPts });
+        return;
+    }
+
     // Source is full image
     const srcPts = [
         { x: 0, y: 0 },

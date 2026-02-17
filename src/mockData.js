@@ -85,18 +85,18 @@ export const ROOMS = [
       { x: 0, y: 1780 }
     ]
   },
-  {
-    id: 'room_hallway_long',
-    name: 'Grand Hallway',
-    category: 'Living',
-    imageUrl: 'https://images.unsplash.com/photo-1505691938895-1758d7fab530?q=80&w=2600&auto=format&fit=crop',
-    floorCoordinates: [
-      { x: 800, y: 1100 },
-      { x: 1800, y: 1100 },
-      { x: 2600, y: 1780 },
-      { x: 0, y: 1780 }
-    ]
-  },
+  // {
+  //   id: 'room_hallway_long',
+  //   name: 'Grand Hallway',
+  //   category: 'Living',
+  //   imageUrl: 'https://images.unsplash.com/photo-1505691938895-1758d7fab530?q=80&w=2600&auto=format&fit=crop',
+  //   floorCoordinates: [
+  //     { x: 800, y: 1100 },
+  //     { x: 1800, y: 1100 },
+  //     { x: 2600, y: 1780 },
+  //     { x: 0, y: 1780 }
+  //   ]
+  // },
   {
     id: 'room_hallway',
     name: 'Oak Wood',
@@ -164,10 +164,10 @@ export const MATERIALS = [
     id: 'mat_4',
     dimensions: '30x30 cm',
     coverage: '1.0 sq.m / box',
-    name: 'Blue Ceramic',
+    name: 'White Ceramic',
     type: 'Tile',
-    textureUrl: 'https://images.unsplash.com/photo-1554266395-c49b6ce8a0d4?q=80&w=2670&auto=format&fit=crop',
-    colorFamily: 'Blue',
+    textureUrl: 'https://www.kajariaceramics.com/storage/product/SPF01018_b.jpg',
+    colorFamily: 'White',
     finish: 'Glossy',
     brightness: 'Medium',
     category: 'Tile'
@@ -190,9 +190,9 @@ export const MATERIALS = [
     coverage: '0.9 sq.m / box',
     name: 'Geometric Mosaic',
     type: 'Tile',
-    textureUrl: 'https://images.unsplash.com/photo-1502005229766-939cb4a5d97f?q=80&w=2670&auto=format&fit=crop',
-    colorFamily: 'Multi',
-    finish: 'Glossy',
+    textureUrl: 'https://www.kajariaceramics.com/storage/product/PF01813_b.jpg',
+    colorFamily: 'Brown',
+    finish: 'Matte',
     brightness: 'High',
     category: 'Tile'
   },
@@ -203,7 +203,7 @@ export const MATERIALS = [
     name: 'Grey Concrete',
     type: 'Tile',
     category: 'Tile',
-    textureUrl: 'https://images.unsplash.com/photo-1517549832541-112ca28c4d9e?q=80&w=2574&auto=format&fit=crop',
+    textureUrl: 'https://www.kajariaceramics.com/storage/product/SPF01020_b.jpg ',
     colorFamily: 'Grey',
     finish: 'Matte',
     brightness: 'Medium'
@@ -215,8 +215,8 @@ export const MATERIALS = [
     name: 'Terrazzo Mix',
     type: 'Tile',
     category: 'Tile',
-    textureUrl: 'https://images.unsplash.com/photo-1596178065887-1198b6148b2e?q=80&w=2670&auto=format&fit=crop',
-    colorFamily: 'Multi',
+    textureUrl: 'https://www.kajariaceramics.com/storage/product/PF01799_b.jpg',
+    colorFamily: 'Galaxy Blue',
     finish: 'Satin',
     brightness: 'High'
   },
@@ -232,8 +232,20 @@ export const MATERIALS = [
     finish: 'Glossy',
     brightness: 'Medium'
   },
-  {
+    {
     id: 'mat_12',
+    dimensions: '120x240 cm',
+    coverage: '2.88 sq.m / box',
+    name: 'Green Marble',
+    type: 'Marble',
+    category: 'Stone',
+    textureUrl: 'https://www.kajariaceramics.com/products/desert-verde?category_ids%5B0%5D=3&filtertype=application&filterid=3&slug_filter_id=3&slug_filter_type=category',
+    colorFamily: 'Green',
+    finish: 'Matte',
+    brightness: 'Medium'
+  },
+  {
+    id: 'mat_13',
     dimensions: '40x60 cm',
     coverage: '0.96 sq.m / box',
     name: 'Rustic Slate',

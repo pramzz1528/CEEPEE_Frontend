@@ -3,11 +3,11 @@ import { useStore } from '../../context/StoreContext';
 // import { MATERIALS } from '../../mockData'; // Removed unused import
 import './Layout.css';
 
-const Sidebar = ({ onBack }) => {
+const Sidebar = ({ onBack, isOpen, toggleSidebar }) => {
     const { materials, currentRoom, primaryMaterial, setPrimaryMaterial } = useStore();
 
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
             <div className="sidebar-header">
                 <div style={{
                     color: '#e31e24',
@@ -28,6 +28,9 @@ const Sidebar = ({ onBack }) => {
                         color: '#ffffffff'
                     }}>®</sup>
                 </div>
+                {/* Mobile Close Button */}
+                <button className="mobile-close-btn" onClick={toggleSidebar}>×</button>
+
                 <div style={{
                     color: '#ffffffff',
                     fontFamily: "'Exo 2', sans-serif",
@@ -48,7 +51,7 @@ const Sidebar = ({ onBack }) => {
 
             {/* Navigation Back */}
             <button className="sidebar-back-btn" onClick={onBack}>
-                ← Gallery
+                ← Back
             </button>
 
             {/* Tile Selector Section */}
@@ -60,7 +63,10 @@ const Sidebar = ({ onBack }) => {
                             <div
                                 key={material.id}
                                 className={`sidebar-mat-item ${primaryMaterial?.id === material.id ? 'active' : ''}`}
-                                onClick={() => setPrimaryMaterial(material)}
+                                onClick={() => {
+                                    setPrimaryMaterial(material);
+                                    if (window.innerWidth <= 768) toggleSidebar(); // Close on selection on mobile
+                                }}
                             >
                                 <div className="sidebar-mat-preview" style={material.textureUrl ? { backgroundImage: `url(${material.textureUrl})` } : { background: '#333' }}>
                                     {/* Optional: Add icons or badges here */}

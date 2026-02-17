@@ -97,3 +97,41 @@
     box-shadow: 0 15px 40px rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
 }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .home-title {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .home-subtitle {
+        font-size: 16px;
+        margin-bottom: 30px;
+        padding: 0 20px;
+    }
+
+    .home-brand {
+        font-size: 14px;
+        letter-spacing: 4px;
+    }
+
+    .home-cta-btn {
+        padding: 14px 30px;
+        font-size: 14px;
+    }
+
+    .home-content {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-title {
+        font-size: 36px;
+    }
+
+    .home-brand {
+        margin-bottom: 15px;
+    }
+}

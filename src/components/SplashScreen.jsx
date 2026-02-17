@@ -46,7 +46,7 @@ const SplashScreen = ({ onFinish }) => {
                 {/* Main Logo Text */}
                 <div style={{
                     color: '#e31e24', // Red color from logo
-                    fontSize: '6rem',
+                    fontSize: 'clamp(3rem, 15vw, 6rem)', // Responsive font size
                     fontWeight: '900',
                     fontFamily: "'Exo 2', sans-serif",
                     letterSpacing: '0.05em',

@@ -44,7 +44,15 @@
     /* Space for TopBar overlap if needed, or visual separation */
     z-index: 20;
     /* Above visualizer */
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar.closed {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    border: none;
+    opacity: 0;
 }
 
 .sidebar-header {
@@ -299,6 +307,86 @@
 /* Adjust Sidebar to be on top of bottom bar */
 .sidebar {
     z-index: 30;
+}
+
+
+/* Responsive Layout Styles */
+@media (max-width: 768px) {
+    .app-layout {
+        flex-direction: column;
+    }
+
+    /* Sidebar Mobile Drawer */
+    .sidebar {
+        width: 100%;
+        /* Full width for better mobile experience */
+        max-width: 320px;
+        /* Limit width on larger mobile/tablet */
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        /* Top level z-index */
+        background: rgba(10, 10, 10, 0.95);
+        /* More opaque */
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 10px 0 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .mobile-close-btn {
+        display: block;
+        /* Show only on mobile */
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    /* Top Bar Mobile */
+    .top-bar {
+        left: 10px;
+        right: 10px;
+        width: calc(100% - 20px);
+        top: 10px;
+        padding: 0 15px;
+    }
+
+    .nav-btn {
+        font-size: 11px;
+    }
+
+    /* Bottom Bar Mobile */
+    .bottom-bar {
+        padding-left: 20px;
+        /* Remove sidebar offset */
+        height: auto;
+        min-height: 140px;
+        padding-bottom: 20px;
+    }
+
+    .material-list {
+        gap: 15px;
+    }
+
+    .material-item {
+        min-width: 80px;
+    }
+
+    .mat-preview {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+/* Ensure mobile close button is hidden on desktop */
+.mobile-close-btn {
+    display: none;
 }
 
 .bar-header {
@@ -623,15 +711,17 @@
 /* Sidebar ID List Styles */
 .sidebar-material-list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: 1fr;
+    /* Full width column */
+    gap: 15px;
+    /* More space */
 }
 
 .sidebar-mat-item {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 8px;
+    border-radius: 12px;
+    padding: 15px;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -639,7 +729,8 @@
     align-items: center;
     height: auto;
     /* Allow growth */
-    min-height: 110px;
+    min-height: 180px;
+    /* Taller card */
 }
 
 .sidebar-mat-item:hover {
@@ -654,15 +745,18 @@
 }
 
 .sidebar-mat-preview {
-    width: 60px;
-    height: 60px;
-    border-radius: 6px;
-    background-size: contain;
+    width: 100%;
+    /* Fill the card width */
+    height: 140px;
+    /* Much taller image */
+    border-radius: 8px;
+    background-size: cover;
+    /* Zoom to fill */
     background-repeat: no-repeat;
     background-position: center;
     background-color: rgba(0, 0, 0, 0.3);
     /* Dark background for transparent/contain images */
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -677,16 +771,19 @@
 
 .sidebar-mat-info .name {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
+    /* Larger font */
     color: #ddd;
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 4px;
 }
 
 .sidebar-mat-info .meta {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
+    /* Larger meta */
     color: #888;
 }
 

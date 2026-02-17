@@ -3,6 +3,7 @@ import { ROOMS, MATERIALS, getSuggestions } from '../mockData';
 import { fetchGeminiSuggestions } from '../services/geminiService';
 
 const StoreContext = createContext();
+StoreContext.displayName = 'StoreContext';
 
 export const useStore = () => useContext(StoreContext);
 

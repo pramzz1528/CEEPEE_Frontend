@@ -1,4 +1,13 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const getBaseUrl = () => {
+    let url = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+    // Remove trailing slash if present
+    if (url.endsWith('/')) url = url.slice(0, -1);
+    // Ensure it doesn't already have /api (unless you want /api/api)
+    // Assuming VITE_API_BASE_URL is just the host usually.
+    return `${url}/api`;
+};
+
+const API_BASE_URL = getBaseUrl();
 
 export const fetchGeminiSuggestions = async (currentMaterial, allMaterials) => {
     try {
@@ -36,46 +45,46 @@ export const fetchGeminiSuggestions = async (currentMaterial, allMaterials) => {
 
 export const visualizeInteraction = async (roomId, materialId, roomUrl, materialUrl) => {
     try {
-        // 1. Fetch images as blobs (Backend expects actual files)
-        const [roomResp, materialResp] = await Promise.all([
-            // Use 'cors' only if needed, but 'no-cors' for opaque prevents blob access.
-            // Standard fetch without mode often works best for mixed content.
-            fetch(roomUrl),
-            fetch(materialUrl)
+        const formData = new FormData();
+
+        // Helper to fetch or fallback
+        const appendResource = async (url, fieldName, urlFieldName) => {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Fetch failed: ${response.statusText}`);
+                const blob = await response.blob();
+                if (blob.size < 100) throw new Error("Invalid blob size");
+                formData.append(fieldName, blob, `${fieldName}.jpg`);
+                console.log(`[Frontend] Attached ${fieldName} as file.`);
+            } catch (err) {
+                console.warn(`[Frontend] Could not fetch ${url} directly (${err.message}). Sending URL to backend.`);
+                // Ensure URL is absolute if it's a relative path (e.g. /living_room.jpg)
+                const absoluteUrl = new URL(url, window.location.origin).href;
+                formData.append(urlFieldName, absoluteUrl);
+            }
+        };
+
+        // Process Room and Tile
+        await Promise.all([
+            appendResource(roomUrl, 'room', 'roomUrl'),
+            appendResource(materialUrl, 'tile', 'tileUrl')
         ]);
 
-        if (!roomResp.ok) throw new Error(`Failed to load Room Image: ${roomResp.statusText}`);
-        if (!materialResp.ok) throw new Error(`Failed to load Tile Image: ${materialResp.statusText}`);
-
-        const roomBlob = await roomResp.blob();
-        const materialBlob = await materialResp.blob();
-
-        console.log(`[Frontend] Prepared Blobs - Room: ${roomBlob.size}, Tile: ${materialBlob.size}`);
-
-        if (roomBlob.size < 100 || materialBlob.size < 100) {
-            throw new Error("One of the image resources is empty or invalid.");
-        }
-
-        // 2. Create FormData and append files
-        const formData = new FormData();
-        formData.append("room", roomBlob, "room.jpg");
-        formData.append("tile", materialBlob, "tile.jpg");
-
         // 3. Send to Backend
-        console.log(`[Frontend] Sending visualization request to ${API_BASE_URL}/visualize-tiles`);
+        const targetUrl = `${API_BASE_URL}/visualize-tiles`;
+        console.log(`[Frontend] Fetching: ${targetUrl}`);
 
-        // Note: Do NOT set Content-Type header when using FormData; fetch sets it automatically with boundary.
-        const response = await fetch(`${API_BASE_URL}/visualize-tiles`, {
+        const response = await fetch(targetUrl, {
             method: "POST",
             body: formData
         });
 
         if (!response.ok) {
-            throw new Error(`Backend API Error: ${response.statusText}`);
+            const errText = await response.text();
+            throw new Error(`Backend API Error: ${response.statusText} - ${errText}`);
         }
 
         const data = await response.json();
-        // Return object with image only
         return { imageUrl: data.imageUrl };
 
     } catch (error) {

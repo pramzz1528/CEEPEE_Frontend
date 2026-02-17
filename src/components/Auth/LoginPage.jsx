@@ -10,8 +10,8 @@ const LoginPage = ({ onLogin }) => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    // FIX: Changed from '/api' to '/api/auth' to match server routes
-    const API_URL = import.meta.env.VITE_API_URL || '/api/auth';
+    // Use direct URL for local dev to avoid proxy issues
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/auth';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -190,7 +190,7 @@ const LoginPage = ({ onLogin }) => {
                             >
                                 Processing...
                             </motion.span>
-                        ) : (isLogin ? 'Login' : 'Info Up & Start')}
+                        ) : (isLogin ? 'Login' : 'Register')}
                     </motion.button>
                 </motion.form>
 
