@@ -54,6 +54,7 @@
 }
 
 /* Responsive Visualizer */
+/* Responsive Visualizer */
 @media (max-width: 768px) {
   .visualizer-container {
     padding-left: 0;
@@ -64,9 +65,26 @@
     /* Let bottom bar overlap or adjust */
   }
 
+  /* Ensure the button is visible and positioned correctly */
   .mobile-menu-btn {
-    display: block !important;
-    /* Show menu button */
+    display: flex !important;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    /* Above almost everything */
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .visualizer-frame {
@@ -93,6 +111,11 @@
   }
 }
 
+/* Default state for mobile menu button (Hidden on Desktop) */
+.mobile-menu-btn {
+  display: none;
+}
+
 .visualizer-frame {
   /* Robust Aspect Ratio Scaling */
   max-width: 100%;
@@ -111,19 +134,47 @@
 }
 
 /* Joined Comparison Labels (Pill Style) */
-.comparison-labels {
-  position: absolute;
-  top: 40px;
-  /* Dynamic left set via inline style */
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  z-index: 25;
-  filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.4));
-  pointer-events: none;
-  /* Let clicks pass through to slider/canvas */
+/* Let clicks pass through to slider/canvas */
+/* This block was likely intended for a specific selector, but was orphaned.
+   Moving it into a media query as per the instruction's context. */
+@media (max-width: 768px) {
   white-space: nowrap;
-  transition: top 0.3s ease;
+  transition: top 0.3s ease,
+  transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .visualizer-container {
+    padding: 0;
+    height: 100vh;
+    /* Ensure full height */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .visualizer-frame {
+    max-height: 55vh;
+    /* Reduce height to fit better on mobile */
+    width: 100%;
+    margin-top: 60px;
+    /* Space for top elements */
+  }
+
+  .visualizer-status {
+    bottom: 80px;
+    /* Move up to avoid bottom bar overlap */
+    width: 85%;
+    padding: 12px 20px;
+  }
+
+  .visualizer-actions {
+    top: auto;
+    bottom: 160px;
+    /* Position above status card */
+    right: 15px;
+    flex-direction: row;
+    /* Horizontal on mobile maybe? or keep vertical but moved */
+  }
 }
 
 @media (max-width: 768px) {

@@ -128,10 +128,24 @@
 
 @media (max-width: 480px) {
     .home-title {
-        font-size: 36px;
+        font-size: 42px;
+        /* Slightly larger for impact but manageable */
+        line-height: 1.2;
+    }
+
+    .home-subtitle {
+        font-size: 15px;
+        padding: 0 15px;
     }
 
     .home-brand {
-        margin-bottom: 15px;
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    .home-cta-btn {
+        width: 100%;
+        /* Full width button on small mobile */
+        max-width: 250px;
     }
 }

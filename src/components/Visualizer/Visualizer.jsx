@@ -607,6 +607,15 @@ const Visualizer = ({ isSidebarOpen, toggleSidebar }) => {
 
             {/* Status Message removed as per user request */}
 
+            {/* Mobile Menu Button - Only visible on mobile */}
+            <button className="mobile-menu-btn" onClick={toggleSidebar}>
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
             {/* Download Buttons Group */}
             <div className="visualizer-actions">
                 {/* Compare Button removed as per user request */}

@@ -324,8 +324,8 @@
         /* Limit width on larger mobile/tablet */
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1000;
-        /* Top level z-index */
+        /* Top level z-index - Above menu button (1000) */
+        z-index: 2000;
         background: rgba(10, 10, 10, 0.95);
         /* More opaque */
     }
