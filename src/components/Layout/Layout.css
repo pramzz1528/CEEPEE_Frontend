@@ -3,8 +3,11 @@
     display: flex;
     height: 100vh;
     width: 100vw;
-    background-color: #000;
-    color: #fff;
+    width: 100vw;
+    background-color: #f4f4f4;
+    /* Light Theme */
+    color: #333;
+    /* Dark Text */
     font-family: 'Inter', sans-serif;
     position: relative;
     /* Anchor for absolute bars */
@@ -23,27 +26,23 @@
     width: 100%;
 }
 
-/* Sidebar - Floating Left Glass */
+/* Sidebar - Floating Left Glass - Light Theme */
+/* Sidebar - Floating Left Glass - Dark Theme */
 .sidebar {
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
     width: 320px;
-    background: rgba(20, 20, 20, 0.4);
-    /* Clearer Glass */
-    backdrop-filter: blur(15px);
-    /* Less Frosty */
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(20, 20, 20, 0.95);
+    /* Dark Glass */
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     padding: 30px;
     padding-top: 100px;
-    /* Space for TopBar overlap if needed, or visual separation */
     z-index: 20;
-    /* Above visualizer */
     transition: width 0.3s ease, transform 0.3s ease;
 }
 
@@ -65,10 +64,8 @@
     font-weight: 800;
     letter-spacing: 2px;
     margin: 0;
-    background: linear-gradient(45deg, #fff, #bbb);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    /* Revert to gradient text or white if defined in JSX override */
+    color: #fff;
 }
 
 .sidebar-header p {
@@ -239,7 +236,8 @@
     background: rgba(227, 30, 36, 0.1);
     /* Brand color hint */
     border: 1px solid rgba(227, 30, 36, 0.4);
-    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .dropdown-item.active .room-name {
@@ -343,7 +341,8 @@
         right: 20px;
         background: none;
         border: none;
-        color: white;
+        color: #333;
+        /* Dark icon for light sidebar */
         font-size: 24px;
         cursor: pointer;
     }
@@ -523,7 +522,7 @@
 .ai-match-section button {
     width: 100%;
     background: linear-gradient(45deg, #007bff, #0056b3);
-    /* Blue theme? Or match VIZA? */
+    /* Blue theme? Or match CEEPEE? */
     /* Let's keep it neutral or use generic button style suitable for dark theme */
     background: rgba(255, 255, 255, 0.1);
     color: white;
@@ -708,13 +707,12 @@
     padding-bottom: 5px;
 }
 
+/* Sidebar ID List Styles - Forced Row Layout */
 /* Sidebar ID List Styles */
 .sidebar-material-list {
     display: grid;
     grid-template-columns: 1fr;
-    /* Full width column */
     gap: 15px;
-    /* More space */
 }
 
 .sidebar-mat-item {
@@ -727,10 +725,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: auto;
-    /* Allow growth */
     min-height: 180px;
-    /* Taller card */
+    height: auto;
 }
 
 .sidebar-mat-item:hover {
@@ -746,16 +742,11 @@
 
 .sidebar-mat-preview {
     width: 100%;
-    /* Fill the card width */
     height: 140px;
-    /* Much taller image */
     border-radius: 8px;
     background-size: cover;
-    /* Zoom to fill */
-    background-repeat: no-repeat;
     background-position: center;
     background-color: rgba(0, 0, 0, 0.3);
-    /* Dark background for transparent/contain images */
     margin-bottom: 12px;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -772,7 +763,6 @@
 .sidebar-mat-info .name {
     display: block;
     font-size: 0.9rem;
-    /* Larger font */
     color: #ddd;
     font-weight: 700;
     white-space: nowrap;
@@ -783,7 +773,6 @@
 
 .sidebar-mat-info .meta {
     font-size: 0.75rem;
-    /* Larger meta */
     color: #888;
 }
 

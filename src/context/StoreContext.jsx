@@ -75,6 +75,8 @@ export const StoreProvider = ({ children }) => {
     }, [loading, rooms, materials]);
 
     // --- Deep Linking: Update URL on Change ---
+    // DISABLED: To prevent "stuck" URL on reload
+    /*
     useEffect(() => {
         if (loading) return;
 
@@ -86,6 +88,7 @@ export const StoreProvider = ({ children }) => {
         const newUrl = `${window.location.pathname}?${params.toString()}`;
         window.history.replaceState({}, '', newUrl);
     }, [currentRoom, primaryMaterial, loading]);
+    */
 
     // Filter materials based on category, and always include 'none' at the beginning
     const noneMaterial = materials.find(m => m.id === 'mat_none');

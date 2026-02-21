@@ -28,8 +28,8 @@ router.post("/visualize-tiles", async (req, res) => {
         }
 
         // 1. Prepare the Model
-        // "gemini-2.5-flash" is the requested model for high speed & quality
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        // "gemini-1.5-flash" is the requested model for high speed & quality
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // 2. Prepare Images
         // We fetch them here so the client only sends URLs (saving bandwidth)

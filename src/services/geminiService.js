@@ -1,5 +1,5 @@
 const getBaseUrl = () => {
-    let url = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+    let url = import.meta.env.VITE_API_BASE_URL || "https://ceepee-backend.onrender.com";
     // Remove trailing slash if present
     if (url.endsWith('/')) url = url.slice(0, -1);
     // Ensure it doesn't already have /api (unless you want /api/api)
@@ -45,43 +45,89 @@ export const fetchGeminiSuggestions = async (currentMaterial, allMaterials) => {
 
 export const visualizeInteraction = async (roomId, materialId, roomUrl, materialUrl) => {
     try {
-        const formData = new FormData();
+        // 1. Validate Inputs
+        if (!roomUrl || !materialUrl) {
+            throw new Error("Missing room or material URL");
+        }
 
-        // Helper to fetch or fallback
-        const appendResource = async (url, fieldName, urlFieldName) => {
+        console.log(`[Frontend] Preparing visualization for Room: ${roomUrl}, Tile: ${materialUrl}`);
+
+        // Helper to fetch image as blob - Robust version
+        const fetchImageBlob = async (url) => {
             try {
+                console.log(`[Frontend] Fetching blob for: ${url}`);
                 const response = await fetch(url);
-                if (!response.ok) throw new Error(`Fetch failed: ${response.statusText}`);
+                if (!response.ok) throw new Error(`Failed to fetch ${url} - Status: ${response.status}`);
+
+                const contentType = response.headers.get("content-type");
+                if (!contentType || !contentType.startsWith("image/")) {
+                    throw new Error(`Invalid content-type for ${url}: ${contentType}. Expected image/*`);
+                }
+
                 const blob = await response.blob();
-                if (blob.size < 100) throw new Error("Invalid blob size");
-                formData.append(fieldName, blob, `${fieldName}.jpg`);
-                console.log(`[Frontend] Attached ${fieldName} as file.`);
-            } catch (err) {
-                console.warn(`[Frontend] Could not fetch ${url} directly (${err.message}). Sending URL to backend.`);
-                // Ensure URL is absolute if it's a relative path (e.g. /living_room.jpg)
-                const absoluteUrl = new URL(url, window.location.origin).href;
-                formData.append(urlFieldName, absoluteUrl);
+                console.log(`[Frontend] Blob fetched successfully for ${url}. Size: ${blob.size}, Type: ${blob.type}`);
+                return blob;
+            } catch (error) {
+                console.warn(`[Frontend] Failed to fetch image blob for ${url}. Sending absolute URL instead.`, error);
+                return null;
             }
         };
 
-        // Process Room and Tile
-        await Promise.all([
-            appendResource(roomUrl, 'room', 'roomUrl'),
-            appendResource(materialUrl, 'tile', 'tileUrl')
-        ]);
+        // 2. Prepare FormData
+        const formData = new FormData();
+        formData.append('roomId', roomId);
+        formData.append('materialId', materialId);
 
-        // 3. Send to Backend
+        // 3. Process Room Image
+        const roomBlob = await fetchImageBlob(roomUrl);
+        if (roomBlob) {
+            formData.append('room', roomBlob, 'room_image.jpg');
+        } else {
+            // Convert to absolute URL if relative, so backend can download it
+            let absoluteUrl = roomUrl.startsWith('/')
+                ? new URL(roomUrl, window.location.origin).href
+                : roomUrl;
+
+            // Fix for Node.js localhost resolution (IPv4 vs IPv6)
+            if (absoluteUrl.includes('localhost')) {
+                absoluteUrl = absoluteUrl.replace('localhost', '127.0.0.1');
+            }
+
+            console.log(`[Frontend] Fallback: Sending absolute roomUrl: ${absoluteUrl}`);
+            formData.append('roomUrl', absoluteUrl);
+        }
+
+        // 4. Process Tile Image
+        const tileBlob = await fetchImageBlob(materialUrl);
+        if (tileBlob) {
+            formData.append('tile', tileBlob, 'tile_image.jpg');
+        } else {
+            // Convert to absolute URL if relative
+            let absoluteUrl = materialUrl.startsWith('/')
+                ? new URL(materialUrl, window.location.origin).href
+                : materialUrl;
+
+            // Fix for Node.js localhost resolution
+            if (absoluteUrl.includes('localhost')) {
+                absoluteUrl = absoluteUrl.replace('localhost', '127.0.0.1');
+            }
+
+            console.log(`[Frontend] Fallback: Sending absolute tileUrl: ${absoluteUrl}`);
+            formData.append('tileUrl', absoluteUrl);
+        }
+
+        // 5. Send to Backend
         const targetUrl = `${API_BASE_URL}/visualize-tiles`;
-        console.log(`[Frontend] Fetching: ${targetUrl}`);
+        console.log(`[Frontend] Uploading data to: ${targetUrl}`);
 
         const response = await fetch(targetUrl, {
             method: "POST",
-            body: formData
+            body: formData, // Auto-sets Content-Type to multipart/form-data
         });
 
         if (!response.ok) {
             const errText = await response.text();
-            throw new Error(`Backend API Error: ${response.statusText} - ${errText}`);
+            throw new Error(`Backend API Error: ${response.status} ${response.statusText} - ${errText}`);
         }
 
         const data = await response.json();

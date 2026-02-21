@@ -39,6 +39,9 @@ const HomePage = ({ onStart }) => {
                     <span style={{ display: 'block', fontSize: '14px', color: '#fff', fontWeight: '400', letterSpacing: '6px', marginTop: '5px' }}>
                         MARBLES | TILES | BATHS
                     </span>
+                    <span style={{ display: 'block', fontSize: '10px', color: '#ccc', fontWeight: '300', letterSpacing: '2px', marginTop: '2px' }}>
+                        SINCE 1980
+                    </span>
                 </motion.div>
 
                 <motion.h1
@@ -68,7 +71,7 @@ const HomePage = ({ onStart }) => {
                     className="home-cta-btn"
                     onClick={onStart}
                 >
-                   Explore Features
+                    Explore Features
                 </motion.button>
             </div>
         </div>

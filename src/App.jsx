@@ -14,14 +14,14 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Add Deep Linking Logic for Initial Load
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('room')) {
-      // Deep link detected
-      setView('app');
-    }
-  }, []);
+  // Deep linking logic removed to prevent auto-redirect on reload
+  // useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   if (params.get('room')) {
+  //     // Deep link detected
+  //     setView('app');
+  //   }
+  // }, []);
 
   const handleLogin = (userData) => {
     setUser(userData);

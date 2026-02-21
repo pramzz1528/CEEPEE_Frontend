@@ -125,7 +125,16 @@ const Login = ({ onLogin }) => {
                                 type={showPassword ? "text" : "password"}
                                 id="password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val.includes(' ')) {
+                                        setError('Spaces are not allowed in password');
+                                        setPassword(val.replace(/\s/g, ''));
+                                    } else {
+                                        if (error === 'Spaces are not allowed in password') setError('');
+                                        setPassword(val);
+                                    }
+                                }}
                                 required
                                 placeholder="Enter your password"
                                 disabled={isLoading}

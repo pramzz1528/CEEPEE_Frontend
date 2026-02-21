@@ -191,37 +191,25 @@
     font-size: 1.1rem;
 }
 
-/* Password Toggle Styles */
-.password-group {
-    position: relative;
-}
-
-.password-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.password-input-wrapper input {
-    padding-right: 40px;
-    /* Space for eye icon */
-}
-
-.toggle-password-btn {
+/* Password Toggle Button */
+.password-toggle-btn {
     position: absolute;
     right: 10px;
+    top: 38px;
+    /* Adjust based on label height + padding */
     background: transparent;
     border: none;
-    color: #aaa;
+    color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
+    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 5px;
-    transition: color 0.2s;
-    outline: none;
+    transition: color 0.3s ease;
+    z-index: 10;
 }
 
-.toggle-password-btn:hover {
-    color: #e31e24;
+.password-toggle-btn:hover {
+    color: #fff;
+    transform: scale(1.1);
 }
